@@ -1,10 +1,12 @@
 /**
  * File to create the data model used in the checklist
  * app. This will be injected around the place
- * Stage - Initial Setup
- * AS 040517
- * v0.2
+ * Stage - Added the observable
+ * AS 060517
+ * v0.3
  */
+
+import { Observable } from 'rxjs/Observable';
 
 export class ChecklistModel {
 
@@ -15,6 +17,10 @@ export class ChecklistModel {
 
     this.items = items;
 
+    this.checklist = Observable.create(observer => {
+      this.checklistObserver = observer;
+    });
+
   }
 
   addItem(item) : void {
@@ -23,6 +29,8 @@ export class ChecklistModel {
       title: item,
       checked: false
     });
+
+    this.checklistObserver.next(true);
   }
 
   removeItem(item) : void {
@@ -31,6 +39,8 @@ export class ChecklistModel {
     if(index > -1) {
       this.items.splice(index, 1);
     }
+
+    this.checklistObserver.next(true);
   }
 
   renameItem(item, title): void {
@@ -39,13 +49,22 @@ export class ChecklistModel {
     if(index > -1) {
       this.items[index].title = title;
     }
+
+    this.checklistObserver.next(true);
   }
 
   setTitle(title): void {
     this.title = title;
+    this.checklistObserver.next(true);
   }
 
   toggleItem(item): void {
     item.checked = !item.checked;
+    this.checklistObserver.next(true);
+  }
+
+  checklistUpdates(): Observable<any> {
+
+    return this.checklist;
   }
 }
